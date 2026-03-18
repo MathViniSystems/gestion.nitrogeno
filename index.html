@@ -145,14 +145,23 @@
     @media (min-width: 700px) {
       .row.two {
         grid-template-columns: 1fr 1fr;
+        align-items: start;
       }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
     }
 
     label {
       display: block;
-      margin-bottom: 7px;
+      margin: 0 0 7px 0;
+      min-height: 2.6em;
       font-family: Quicksand, Arial, sans-serif;
       font-size: 0.95rem;
+      line-height: 1.35;
       color: var(--deep);
     }
 
@@ -326,13 +335,6 @@
     .card.brown .help-box {
       color: rgba(255,255,255,0.92);
     }
-
-    .small-note {
-      font-family: Quicksand, Arial, sans-serif;
-      font-size: 0.92rem;
-      line-height: 1.45;
-      color: #52595c;
-    }
   </style>
 </head>
 <body>
@@ -358,18 +360,18 @@
           <h2 class="section-title">Parámetros de entrada</h2>
 
           <div class="row two">
-            <div>
+            <div class="field">
               <label for="yan">Nitrógeno asimilable por las levaduras – YAN (mg/L)</label>
               <input id="yan" inputmode="decimal" placeholder="Ej.: 110" />
             </div>
-            <div>
+            <div class="field">
               <label for="tavp">Grado alcohólico probable (% vol)</label>
               <input id="tavp" inputmode="decimal" placeholder="Ej.: 13,5" />
             </div>
           </div>
 
           <div class="row">
-            <div>
+            <div class="field">
               <label for="volumeHl">Volumen (hL)</label>
               <input id="volumeHl" inputmode="decimal" placeholder="Ej.: 85" />
             </div>
@@ -393,13 +395,7 @@
             <span>Dosis de DAP a añadir (g/hL)</span>
             <span class="value" id="doseGhL">-</span>
           </div>
-          <div class="help-box">
-            Base de cálculo: 140 mg/L a 12 % vol, luego +30 mg/L por cada grado adicional.
-            En maceración larga se restan 20 mg/L.
-          </div>
-        </div>
 
-        <div class="card">
           <div class="btn-row">
             <button class="btn-primary" type="button" id="exampleBtn">Rellenar un ejemplo</button>
           </div>
@@ -426,17 +422,6 @@
           </div>
 
           <div class="messages" id="messages"></div>
-        </div>
-
-        <div class="card">
-          <h2 class="section-title">Notas</h2>
-          <div class="small-note">
-            Esta calculadora es una ayuda a la decisión. Los resultados deben interpretarse según el contexto
-            enológico, la cinética fermentativa y el marco reglamentario aplicable.
-          </div>
-          <div class="small-note" style="margin-top:10px;">
-            Conviene confirmar siempre la estrategia de nutrición con analíticas y con el seguimiento de la fermentación.
-          </div>
         </div>
       </section>
     </div>
