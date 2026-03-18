@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de nutrición de fermentación – DAP</title>
+  <style>
+    :root{
+      --bg: #FFF8E1;
+      --card: #ECECEC;
+      --card-2: #F7F3E8;
+      --text: #111111;
+      --teal: #2A6F78;
+      --deep: #3C3F42;
+      --tan: #B99367;
+      --shadow: rgba(0,0,0,0.15);
+      --danger: #B3261E;
+      --warning: #A66C22;
+      --white: #ffffff;
+      --border: #DADADA;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Georgia, serif;
+      background: linear-gradient(180deg, #FFF8E1 0%, #FFFDF5 100%);
+      color: var(--text);
+    }
+
+    .wrap {
+      width: min(1100px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 48px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--teal), #356e78);
+      color: var(--white);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 10px 25px var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: clamp(1.8rem, 2.8vw, 2.7rem);
+      line-height: 1.1;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 820px;
+      opacity: 0.96;
+      font-family: Quicksand, Arial, sans-serif;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      color: var(--white);
+      opacity: 0.92;
+      font-family: Quicksand, Arial, sans-serif;
+      letter-spacing: 0.02em;
+      max-width: 700px;
+    }
+
+    .btn-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    @media (min-width: 920px) {
+      .grid.two {
+        grid-template-columns: 1.05fr 0.95fr;
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: 0 8px 20px var(--shadow);
+      border: 1px solid rgba(0,0,0,0.03);
+    }
+
+    .card.alt {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+    }
+
+    .card.brown {
+      background: linear-gradient(135deg, var(--tan), #a98256);
+      color: var(--white);
+      border: none;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1.2rem;
+      color: var(--deep);
+    }
+
+    .card.brown .section-title {
+      color: var(--white);
+    }
+
+    .muted {
+      font-family: Quicksand, Arial, sans-serif;
+      color: #4f5558;
+      font-size: 0.96rem;
+      line-height: 1.45;
+    }
+
+    .card.brown .muted {
+      color: rgba(255,255,255,0.92);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    @media (min-width: 700px) {
+      .row.two {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-family: Quicksand, Arial, sans-serif;
+      font-size: 0.95rem;
+      color: var(--deep);
+    }
+
+    input {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 14px;
+      border: 1px solid #cfcfcf;
+      background: #fff;
+      color: var(--text);
+      font-size: 1rem;
+      font-family: Quicksand, Arial, sans-serif;
+      outline: none;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+
+    input:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 4px rgba(42,111,120,0.12);
+    }
+
+    .switch-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .chip {
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 999px;
+      padding: 11px 15px;
+      cursor: pointer;
+      font-family: Quicksand, Arial, sans-serif;
+      transition: all .15s ease;
+    }
+
+    .chip.active {
+      background: var(--tan);
+      color: white;
+      border-color: var(--tan);
+    }
+
+    .inline-result {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      background: #fff;
+      border-radius: 18px;
+      padding: 15px 16px;
+      border: 1px solid var(--border);
+      font-family: Quicksand, Arial, sans-serif;
+    }
+
+    .card.brown .inline-result {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: var(--white);
+      backdrop-filter: blur(2px);
+    }
+
+    .inline-result .value {
+      font-size: 1.15rem;
+      color: var(--deep);
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .card.brown .inline-result .value {
+      color: var(--white);
+    }
+
+    .big-number {
+      font-size: clamp(2rem, 5vw, 3rem);
+      line-height: 1;
+      margin: 6px 0 8px;
+    }
+
+    .messages {
+      margin-top: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .msg {
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-family: Quicksand, Arial, sans-serif;
+      line-height: 1.45;
+    }
+
+    .msg.warning {
+      background: rgba(166,108,34,0.13);
+      color: #7c5016;
+      border: 1px solid rgba(166,108,34,0.25);
+    }
+
+    .msg.danger {
+      background: rgba(179,38,30,0.08);
+      color: var(--danger);
+      border: 1px solid rgba(179,38,30,0.18);
+    }
+
+    .msg.info {
+      background: rgba(42,111,120,0.09);
+      color: #1d5961;
+      border: 1px solid rgba(42,111,120,0.16);
+    }
+
+    .card.brown .msg.warning {
+      background: rgba(255,255,255,0.18);
+      color: #fff6df;
+      border: 1px solid rgba(255,255,255,0.22);
+    }
+
+    .card.brown .msg.danger {
+      background: rgba(120, 20, 20, 0.28);
+      color: #fff0f0;
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .card.brown .msg.info {
+      background: rgba(255,255,255,0.12);
+      color: #f7f7f7;
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      padding: 13px 18px;
+      cursor: pointer;
+      font-size: 0.98rem;
+      font-family: Quicksand, Arial, sans-serif;
+      transition: transform .08s ease, opacity .15s ease, box-shadow .15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+
+    .btn-primary {
+      background: var(--teal);
+      color: var(--white);
+      box-shadow: 0 8px 18px rgba(42,111,120,0.22);
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--deep);
+      border: 1px solid var(--border);
+    }
+
+    .help-box {
+      margin-top: 8px;
+      font-family: Quicksand, Arial, sans-serif;
+      font-size: 0.93rem;
+      color: #4c5356;
+      line-height: 1.5;
+    }
+
+    .card.brown .help-box {
+      color: rgba(255,255,255,0.92);
+    }
+
+    .small-note {
+      font-family: Quicksand, Arial, sans-serif;
+      font-size: 0.92rem;
+      line-height: 1.45;
+      color: #52595c;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="topbar">
+        <div class="brand">Mini calculadora online extraída del software VS Winery Management</div>
+        <div class="btn-stack">
+          <button class="btn-secondary" type="button" id="helpBtn">Ayuda cálculo</button>
+          <button class="btn-secondary" type="button" id="resetBtn">Reiniciar</button>
+        </div>
+      </div>
+      <h1>Calculadora de nutrición de fermentación – DAP</h1>
+      <p>
+        Herramienta de ayuda para estimar la necesidad de nitrógeno asimilable y la dosis de DAP a añadir
+        según el YAN medido, el grado alcohólico probable y el volumen del mosto.
+      </p>
+    </section>
+
+    <div class="grid two">
+      <section class="grid">
+        <div class="card">
+          <h2 class="section-title">Parámetros de entrada</h2>
+
+          <div class="row two">
+            <div>
+              <label for="yan">Nitrógeno asimilable por las levaduras – YAN (mg/L)</label>
+              <input id="yan" inputmode="decimal" placeholder="Ej.: 110" />
+            </div>
+            <div>
+              <label for="tavp">Grado alcohólico probable (% vol)</label>
+              <input id="tavp" inputmode="decimal" placeholder="Ej.: 13,5" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="volumeHl">Volumen (hL)</label>
+              <input id="volumeHl" inputmode="decimal" placeholder="Ej.: 85" />
+            </div>
+          </div>
+
+          <div class="help-box">Tipo de maceración</div>
+          <div class="switch-group">
+            <button class="chip" type="button" id="btnLong">Maceración larga</button>
+            <button class="chip active" type="button" id="btnShort">Poca o ninguna maceración</button>
+          </div>
+        </div>
+
+        <div class="card alt">
+          <h2 class="section-title">Cálculos intermedios</h2>
+          <div class="inline-result">
+            <span>Nitrógeno asimilable necesario (mg/L)</span>
+            <span class="value" id="neededYan">-</span>
+          </div>
+          <div style="height:10px;"></div>
+          <div class="inline-result">
+            <span>Dosis de DAP a añadir (g/hL)</span>
+            <span class="value" id="doseGhL">-</span>
+          </div>
+          <div class="help-box">
+            Base de cálculo: 140 mg/L a 12 % vol, luego +30 mg/L por cada grado adicional.
+            En maceración larga se restan 20 mg/L.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="btn-row">
+            <button class="btn-primary" type="button" id="exampleBtn">Rellenar un ejemplo</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid">
+        <div class="card brown">
+          <h2 class="section-title">Cantidad total de DAP a añadir</h2>
+
+          <div class="big-number" id="totalG">-</div>
+          <div class="muted" id="totalLabel"></div>
+
+          <div class="help-box" style="margin-top:12px;">Estrategia de adición</div>
+          <div class="messages">
+            <div class="msg info" id="strategyBox">Completa los parámetros para obtener una recomendación.</div>
+          </div>
+
+          <div style="height:14px;"></div>
+
+          <div class="inline-result">
+            <span>Límite de referencia</span>
+            <span class="value">100,0 g/hL</span>
+          </div>
+
+          <div class="messages" id="messages"></div>
+        </div>
+
+        <div class="card">
+          <h2 class="section-title">Notas</h2>
+          <div class="small-note">
+            Esta calculadora es una ayuda a la decisión. Los resultados deben interpretarse según el contexto
+            enológico, la cinética fermentativa y el marco reglamentario aplicable.
+          </div>
+          <div class="small-note" style="margin-top:10px;">
+            Conviene confirmar siempre la estrategia de nutrición con analíticas y con el seguimiento de la fermentación.
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const LIMIT_GHL = 100.0;
+      let maceration = "corta";
+
+      const $ = (id) => document.getElementById(id);
+
+      function parseValue(s) {
+        if (s == null) return null;
+        const cleaned = String(s)
+          .trim()
+          .replace(/,/g, ".")
+          .replace(/[^0-9.\-]/g, "");
+        if (!cleaned) return null;
+        const n = Number(cleaned);
+        return Number.isFinite(n) ? n : null;
+      }
+
+      function fmt(v, d = 1) {
+        if (v == null || Number.isNaN(v)) return "-";
+        return Number(v).toFixed(d).replace(".", ",");
+      }
+
+      function clearMessages() {
+        $("messages").innerHTML = "";
+      }
+
+      function pushMessage(type, text) {
+        const box = $("messages");
+        const el = document.createElement("div");
+        el.className = "msg " + type;
+        el.textContent = text;
+        box.appendChild(el);
+      }
+
+      function setActiveMode() {
+        $("btnLong").classList.toggle("active", maceration === "larga");
+        $("btnShort").classList.toggle("active", maceration === "corta");
+      }
+
+      function strategyText(needed, totalG) {
+        if (needed == null || totalG == null) {
+          return "Completa los parámetros para obtener una recomendación.";
+        }
+
+        if (needed <= 0 || totalG <= 0) {
+          return "No es necesario añadir nitrógeno al mosto. Puede quedar nitrógeno asimilable residual en el vino, por lo que conviene adaptar posteriormente la gestión del vino.";
+        }
+
+        if (needed < 70.0) {
+          return "Se recomienda añadir la dosis completa, es decir " + fmt(totalG, 0) + " g, a una densidad de 1060.";
+        }
+
+        if (needed < 120.0) {
+          const oneThird = totalG / 3.0;
+          const twoThird = totalG * 2.0 / 3.0;
+          return "Se recomienda añadir " + fmt(oneThird, 0) + " g una vez encubado el mosto o en el momento de la inoculación, y " + fmt(twoThird, 0) + " g a una densidad de 1060.";
+        }
+
+        const half = totalG / 2.0;
+        return "Se recomienda añadir " + fmt(half, 0) + " g una vez encubado el mosto o en el momento de la inoculación, y " + fmt(half, 0) + " g a una densidad de 1060.";
+      }
+
+      function recalc() {
+        clearMessages();
+
+        const yan = parseValue($("yan").value);
+        const tavp = parseValue($("tavp").value);
+        const volHl = parseValue($("volumeHl").value);
+
+        let needed = null;
+        let doseGhL = null;
+        let totalG = null;
+
+        if (yan != null && tavp != null && volHl != null) {
+          if (volHl <= 0) {
+            pushMessage("danger", "El volumen debe ser superior a 0.");
+          } else if (tavp <= 0) {
+            pushMessage("danger", "El grado alcohólico probable debe ser superior a 0.");
+          } else if (yan < 0) {
+            pushMessage("danger", "El YAN no puede ser negativo.");
+          } else {
+            needed = 140.0 + ((tavp - 12.0) * 30.0) - yan;
+
+            if (maceration === "larga") needed -= 20.0;
+            if (needed < 0) needed = 0;
+
+            doseGhL = (needed * 10.0) / 27.0;
+            totalG = doseGhL * volHl;
+
+            if (doseGhL > LIMIT_GHL) {
+              pushMessage("danger", "La dosis calculada supera el límite de referencia de 100 g/hL.");
+            } else if (doseGhL > 80) {
+              pushMessage("warning", "La dosis calculada es elevada. Conviene revisar la estrategia de adición.");
+            }
+
+            if (tavp < 10 || tavp > 18) {
+              pushMessage("info", "Comprueba que el grado alcohólico probable introducido sea coherente con tu situación fermentativa.");
+            }
+          }
+        } else {
+          pushMessage("info", "Introduce YAN, grado alcohólico probable y volumen para obtener el cálculo.");
+        }
+
+        $("neededYan").textContent = needed == null ? "-" : fmt(needed, 0) + " mg/L";
+        $("doseGhL").textContent = doseGhL == null ? "-" : fmt(doseGhL, 1) + " g/hL";
+        $("totalG").textContent = totalG == null ? "-" : fmt(totalG, 0) + " g";
+        $("totalLabel").textContent = totalG == null ? "" : "Para un volumen de " + fmt(volHl, 1) + " hL";
+        $("strategyBox").textContent = strategyText(needed, totalG);
+      }
+
+      function fillExample() {
+        $("yan").value = "90";
+        $("tavp").value = "14,0";
+        $("volumeHl").value = "80";
+        maceration = "corta";
+        setActiveMode();
+        recalc();
+      }
+
+      function resetAll() {
+        $("yan").value = "";
+        $("tavp").value = "";
+        $("volumeHl").value = "";
+        maceration = "corta";
+        setActiveMode();
+        recalc();
+      }
+
+      function showHelp() {
+        alert(
+          "Ayuda cálculo – nutrición de fermentación / DAP\n\n" +
+          "• Se considera una necesidad de 140 mg/L de nitrógeno asimilable a 12 % vol.\n" +
+          "• A partir de ahí, se añaden 30 mg/L por cada grado alcohólico probable adicional.\n" +
+          "• En caso de maceración larga, se restan 20 mg/L.\n" +
+          "• Conversión utilizada para el DAP: g/hL = (mg/L necesarios × 10) / 27.\n" +
+          "• La estrategia de adición propuesta es orientativa y debe confirmarse según analíticas y seguimiento de fermentación."
+        );
+      }
+
+      ["yan", "tavp", "volumeHl"].forEach(function(id) {
+        $(id).addEventListener("input", recalc);
+      });
+
+      $("btnLong").addEventListener("click", function () {
+        maceration = "larga";
+        setActiveMode();
+        recalc();
+      });
+
+      $("btnShort").addEventListener("click", function () {
+        maceration = "corta";
+        setActiveMode();
+        recalc();
+      });
+
+      $("exampleBtn").addEventListener("click", fillExample);
+      $("resetBtn").addEventListener("click", resetAll);
+      $("helpBtn").addEventListener("click", showHelp);
+
+      setActiveMode();
+      recalc();
+    });
+  </script>
+</body>
+</html>
